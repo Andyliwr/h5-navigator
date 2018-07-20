@@ -1,0 +1,57 @@
+{
+  "name": "new_project",
+  "version": "1.0.0",
+  "description": "h5自定义导航栏",
+  "main": "index.js",
+  "scripts": {
+    "dev": "gulp default",
+    "clean": "gulp clean",
+    "build": "gulp build"
+  },
+  "keywords": [
+    "导航栏"
+  ],
+  "author": "andyliwr",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-es2015": "^6.24.1",
+    "browser-sync": "^2.23.6",
+    "eslint-plugin-jquery": "^1.3.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.1",
+    "gulp-eslint": "^4.0.1",
+    "jshint": "^2.9.4"
+  },
+  "dependencies": {
+    "browser-sync": "^2.23.6",
+    "gulp-autoprefixer": "^3.1.1",
+    "gulp-cache": "^0.4.6",
+    "gulp-clean": "^0.3.2",
+    "gulp-concat": "^2.6.1",
+    "gulp-cssbeautify": "^0.1.3",
+    "gulp-debug": "^3.1.0",
+    "gulp-foal": "^1.1.2",
+    "gulp-ftp": "^1.1.0",
+    "gulp-imagemin": "^3.1.1",
+    "gulp-jshint": "^2.0.4",
+    "gulp-livereload": "^3.8.1",
+    "gulp-minify-css": "^1.2.4",
+    "gulp-notify": "^3.0.0",
+    "gulp-plumber": "^1.1.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-rev-timestamp": "^0.0.1",
+    "gulp-sass": "^3.1.0",
+    "gulp-sftp": "^0.1.5",
+    "gulp-tinypng": "^1.0.2",
+    "gulp-uglify": "^2.0.1",
+    "gulp-util": "^3.0.8",
+    "gulp-watch": "^4.3.11",
+    "gulp-webserver": "^0.9.1",
+    "gulp-zip": "^4.0.0",
+    "imagemin-pngquant": "^5.0.0",
+    "plugin-error": "^1.0.1"
+  }
+}

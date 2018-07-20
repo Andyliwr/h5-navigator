@@ -1,0 +1,126 @@
+// 通用css
+@mixin font-size($font-size) {
+  font-size: $font-size;
+  [data-dpr='2'] & {
+    font-size: $font-size * 2;
+  }
+  [data-dpr='3'] & {
+    font-size: $font-size * 3.2;
+  }
+}
+
+$height: 1.1333rem;
+
+// 主要样式区
+body {
+  box-sizing: content-box;
+  position: relative;
+  padding-top: $height;
+}
+.navigator {
+  width: 100%;
+  height: $height;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+  color: #ffffff;
+  overflow: hidden;
+  .nav-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: $height;
+    z-index: 10001;
+  }
+  .nav {
+    position: relative;
+    width: 100%;
+    height: $height;
+    z-index: 10002;
+  }
+  @include font-size(14px);
+  .back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: $height;
+    height: $height;
+    text-align: center;
+    .iconfont {
+      line-height: $height;
+    }
+  }
+  .title {
+    line-height: $height;
+    width: 5rem;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-wrap: normal;
+    &.center {
+      margin: 0 auto;
+      text-align: center;
+    }
+    &.left {
+      margin-left: $height;
+      text-align: left;
+    }
+    .inner {
+      .text {
+        padding-right: 1rem;
+        box-sizing: border-box;
+        position: relative;
+        &:last-child {
+          padding-right: 0;
+        }
+      }
+    }
+  }
+  .other {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: $height;
+    height: $height;
+    text-align: center;
+    .iconfont {
+      line-height: $height;
+    }
+  }
+}
+
+// 字体图标样式区
+
+@font-face {
+  font-family: 'iconfont';
+  src: url('//at.alicdn.com/t/font_752342_l82chvn15ec.eot?t=1531906838986'); /* IE9*/
+  src: url('//at.alicdn.com/t/font_752342_l82chvn15ec.eot?t=1531906838986#iefix') format('embedded-opentype'),
+    /* IE6-IE8 */
+      url('data:application/x-font-woff;charset=utf-8;base64,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')
+      format('woff'),
+    url('//at.alicdn.com/t/font_752342_l82chvn15ec.ttf?t=1531906838986') format('truetype'),
+    /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/ url('//at.alicdn.com/t/font_752342_l82chvn15ec.svg?t=1531906838986#iconfont') format('svg'); /* iOS 4.1- */
+}
+
+.iconfont {
+  font-family: 'iconfont' !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-back:before {
+  content: '\e61b';
+}
+
+.icon-share:before {
+  content: '\e630';
+}
+
+.icon-more:before {
+  content: '\e774';
+}
