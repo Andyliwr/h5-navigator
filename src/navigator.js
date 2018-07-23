@@ -5,7 +5,7 @@
  * @last_modified 2018/07/17 15:21
  */
 
-(function(factory) {
+;(function(factory) {
   // 如果要兼容 CMD 等其他标准，可以在下面添加条件，比如：
   // CMD: typeof define === 'function' && define.cmd
   // UMD: typeof exports === 'object'
@@ -63,11 +63,11 @@
     title: document.title, // 页面标题
     titleAlign: 'center', // 页面标题的对齐方式，left或者center
     backgroundColor: '#e83031', // 导航背景颜色，多个区域请用逗号隔开
-    autoHideNavArea: '.header-img', // 导航栏经过该区域的时候透明化
-    showRightNav: true, // 是否展示导航最右边的按钮
-    rightNavIcon: 'share', // 导航最右边的按钮图标名称，可选值more(更多)，share(分享)
+    autoHideNavArea: '', // 导航栏经过该区域的时候透明化
+    showRightNav: false, // 是否展示导航最右边的按钮
+    rightNavIcon: '', // 导航最右边的按钮图标名称，可选值more(更多)，share(分享)
     clickLeftNavCallback: null, // 点击导航最左边边的按钮图标的执行函数，如传空，默认跳转到上一页
-    clickRightNavCallback: () => {} // 点击导航最右边的按钮图标的执行函数
+    clickRightNavCallback: null // 点击导航最右边的按钮图标的执行函数
   };
 
   /**
