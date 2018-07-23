@@ -16,22 +16,40 @@ README: [English](README_en.md) | [中文](README_zh.md)
 
 ## 用法
 
-- 如何下载这个项目：一般情况下 git clone 该项目地址即可，当然你也可以提供其他包管理下载安装方式；
-- 项目依赖：你需要说明编译运行这个项目前需要哪些依赖；
-- 安装：你需要说明如何编译安装/运行这个项目；
-- 部署：如果这个项目可以部署的话，请最好注明部署要注意的事项；
-- Debug 方法：理想状况下，你的用户会顺利编译并运行这个项目，但你要确保用户遇到了问题不会来打扰你（如提交 Issues），你还需要提供用户可能会遇到的常见问题；
+- 下载源代码
 
-## 贡献
+```
+git clone https://github.com/Andyliwr/h5-navigator.git
+```
 
-这里是贡献的内容
+- 在页面中引入`dist/navigator.min.css`和`dist/navigator.min.js`
 
-## 版权
+请注意在引入`zepto`之后引入`dist/navigator.min.js`
 
-这里是版权的内容
+- 初始化插件
 
-## 鸣谢
+```
+$.fn.H5Navigator.init({
+  openDebug: false,
+  title: document.title,
+  titleAlign: 'center',
+  backgroundColor: '#e83031',
+  autoHideNavArea: '.header-img',
+  showRightNav: true,
+  rightNavIcon: 'share',
+  clickLeftNavCallback: null,
+  clickRightNavCallback: () => { }
+});
+```
 
-- [Andyliwr](https://www.baidu.com): aksdhasdhasdasdasd
-- [Andyliwr](https://www.baidu.com): aksdhasdhasdasdasd
-- [Andyliwr](https://www.baidu.com): aksdhasdhasdasdasd
+## 参数说明
+
+- `openDebug`: 是否开启调试模式，默认 `false`
+- `title`: 自定义页面标题，默认值是`document.title`
+- `titleAlign`: 标题齐方式，默认为`center`
+- `backgroundColor`: 导航背景颜色，默认为`#e83031`
+- `autoHideNavArea`: 需要自动隐藏导航的区域的选择器，导航在滑过该区域的时候透明度会从 0 逐渐变到 1
+- `showRightNav`: 是否展示导航右边的按钮，默认为`false`
+- `rightNavIcon`: 导航右边的按钮`iconfont`图标名称
+- `clickLeftNavCallback`: 点击导航左边按钮的回调, 默认为`null`，为空则会执行默认函数`history.back()`
+- `clickRightNavCallback`: 点击导航右边按钮的回调

@@ -45,13 +45,13 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
    * 插件名称，即调用时的名称（$.fn.pluginName）
    * @type {string}
    */
-  Plugin.pluginName = 'thsH5Navigator';
+  Plugin.pluginName = 'H5Navigator';
 
   /**
    * 插件缓存名称，插件通过 data 方法缓存在 dom 结构里，存储数据的名称
    * @type {string}
    */
-  Plugin.dataName = 'thsH5NavigatorData';
+  Plugin.dataName = 'H5NavigatorData';
 
   /**
    * 插件版本
@@ -305,21 +305,12 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
   };
 
   /**
-   * 可选：
-   * 通过在 dom 上定义 data-role='pluginName' 的方式，自动实例化插件，省去页面编写代码
-   * 在这里还可以扩展更多配置，仅仅通过 data 属性 API 就能使用插件
+   * 初始化导航
+   * @param {{}}} options
    */
-  $(document).ready(function () {
+  $.fn[Plugin.pluginName].init = function (options) {
     // 自动插入dom
     $('<div data-role="' + Plugin.pluginName + '">').addClass('navigator').appendTo('body');
-    // 进行插件的初始化
-    $('[data-role="' + Plugin.pluginName + '"]').each(function () {
-      var $this = $(this);
-      var data = $.fn[Plugin.pluginName].pluginData[$this.data(Plugin.dataName)];
-
-      // ...
-
-      $.fn[Plugin.pluginName].call($this, data);
-    });
-  });
+    $.fn[Plugin.pluginName].call($('div[data-role="' + Plugin.pluginName + '"]'), options);
+  };
 });
