@@ -5,7 +5,7 @@
  * @last_modified 2018/07/17 15:21
  */
 
-;(function(factory) {
+(function(factory) {
   // 如果要兼容 CMD 等其他标准，可以在下面添加条件，比如：
   // CMD: typeof define === 'function' && define.cmd
   // UMD: typeof exports === 'object'
@@ -170,6 +170,11 @@
             if (opacity > 1) opacity = 1;
             if (opacity < 0) opacity = 0;
             this.$element.find('.nav-bg').css('opacity', 1 - opacity);
+          } else {
+            // 不在自动隐藏区域透明度设置为1
+            if (this.$element.find('.nav-bg').css('opacity') !== 1) {
+              this.$element.find('.nav-bg').css('opacity', 1);
+            }
           }
         };
         changeOpacity();
