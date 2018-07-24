@@ -2,12 +2,12 @@ body {
   -webkit-box-sizing: content-box;
   box-sizing: content-box;
   position: relative;
-  padding-top: 88px;
+  padding-top: 44px;
 }
 
 .navigator {
   width: 100%;
-  height: 88px;
+  height: 44px;
   position: fixed;
   top: 0;
   left: 0;
@@ -22,14 +22,14 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  height: 88px;
+  height: 44px;
   z-index: 10001;
 }
 
 .navigator .nav {
   position: relative;
   width: 100%;
-  height: 88px;
+  height: 44px;
   z-index: 10002;
 }
 
@@ -45,13 +45,13 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  width: 88px;
-  height: 88px;
+  width: 44px;
+  height: 44px;
   text-align: center;
 }
 
 .navigator .back .iconfont {
-  line-height: 88px;
+  line-height: 44px;
   font-size: 14px;
 }
 
@@ -64,7 +64,7 @@ body {
 }
 
 .navigator .title {
-  line-height: 88px;
+  line-height: 44px;
   width: 5rem;
   text-align: center;
   overflow: hidden;
@@ -79,7 +79,7 @@ body {
 }
 
 .navigator .title.left {
-  margin-left: 88px;
+  margin-left: 44px;
   text-align: left;
 }
 
@@ -98,13 +98,13 @@ body {
   position: absolute;
   top: 0;
   right: 0;
-  width: 88px;
-  height: 88px;
+  width: 44px;
+  height: 44px;
   text-align: center;
 }
 
 .navigator .other .iconfont {
-  line-height: 88px;
+  line-height: 44px;
   font-size: 14px;
 }
 
