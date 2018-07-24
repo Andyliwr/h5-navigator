@@ -166,7 +166,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             // 计算导航高度到元素底部的距离，以此来决定透明度的值，40是偏移值
             var opacity = (autoHideAreaElement.offset().top + autoHideAreaElement.offset().height + 80 - navHeight - scrollHeight) / autoHideAreaElement.offset().height;
             opacity = opacity.toFixed(2);
-            _this.debug(opacity);
             if (opacity > 1) opacity = 1;
             if (opacity < 0) opacity = 0;
             _this.$element.find('.nav-bg').css('opacity', 1 - opacity);
