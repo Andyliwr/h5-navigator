@@ -9,7 +9,7 @@
   }
 }
 
-$height: 1.1333rem;
+$height: 88px;
 
 // 主要样式区
 body {
@@ -50,6 +50,7 @@ body {
     text-align: center;
     .iconfont {
       line-height: $height;
+      @include font-size(14px);
     }
   }
   .title {
@@ -88,6 +89,7 @@ body {
     text-align: center;
     .iconfont {
       line-height: $height;
+      @include font-size(14px);
     }
   }
 }

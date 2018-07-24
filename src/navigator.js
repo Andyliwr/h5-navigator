@@ -60,7 +60,7 @@
    */
   Plugin.defaults = {
     openDebug: true, // 是否开启调试模式
-    title: document.title, // 页面标题
+    title: '', // 页面标题
     titleAlign: 'center', // 页面标题的对齐方式，left或者center
     backgroundColor: '#e83031', // 导航背景颜色，多个区域请用逗号隔开
     autoHideNavArea: '', // 导航栏经过该区域的时候透明化
@@ -164,7 +164,9 @@
             // 去除body的padding-top，让页面在顶部展示
             $('body').css('padding-top', '0');
             // 计算导航高度到元素底部的距离，以此来决定透明度的值，40是偏移值
-            let opacity = (autoHideAreaElement.offset().top + autoHideAreaElement.offset().height + 40 - navHeight - scrollHeight) / autoHideAreaElement.offset().height;
+            let opacity = (autoHideAreaElement.offset().top + autoHideAreaElement.offset().height + 80 - navHeight - scrollHeight) / autoHideAreaElement.offset().height;
+            opacity = opacity.toFixed(2);
+            this.debug(opacity);
             if (opacity > 1) opacity = 1;
             if (opacity < 0) opacity = 0;
             this.$element.find('.nav-bg').css('opacity', 1 - opacity);
