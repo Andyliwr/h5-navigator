@@ -319,4 +319,36 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     $('<div data-role="' + Plugin.pluginName + '">').addClass('navigator').appendTo('body');
     $.fn[Plugin.pluginName].call($('div[data-role="' + Plugin.pluginName + '"]'), options);
   };
+
+  /**
+   * 修改导航属性
+   */
+  $.fn[Plugin.pluginName].changeOptions = function (newOptions) {
+    // 确保导航已经被初始化了
+    var $element = $('[data-role="' + Plugin.pluginName + '"]');
+    if ($element.length > 0) {
+      var _loop = function _loop(i) {
+        switch (i) {
+          case 'title':
+            console.log($element);
+            $element.find('.title .inner .text').html(newOptions[i]);
+            break;
+          case 'clickLeftNavCallback':
+            if (typeof newOptions[i] === 'function') {
+              $element.find('.nav .back').off('click').on('click', function () {
+                newOptions[i]();
+              });
+            }
+            break;
+          default:
+            break;
+        }
+      };
+
+      // 遍历新属性
+      for (var i in newOptions) {
+        _loop(i);
+      }
+    }
+  };
 });
