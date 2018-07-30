@@ -29,16 +29,18 @@ git clone https://github.com/Andyliwr/h5-navigator.git
 - 初始化插件
 
 ```
-$.fn.H5Navigator.init({
-  openDebug: false,
-  title: document.title,
-  titleAlign: 'center',
-  backgroundColor: '#e83031',
-  autoHideNavArea: '.header-img',
-  showRightNav: true,
-  rightNavIcon: 'share',
-  clickLeftNavCallback: null,
-  clickRightNavCallback: () => { }
+$(document).ready(function () {
+  $.fn.H5Navigator.init({
+    openDebug: false,
+    Title: document.title,
+    titleAlign: 'center',
+    backgroundColor: '#e83031',
+    autoHideNavArea: '.header-img',
+    showRightNav: true,
+    rightNavIcon: 'share',
+    clickLeftNavCallback: null,
+    clickRightNavCallback: null
+  });
 });
 ```
 
