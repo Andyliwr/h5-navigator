@@ -87,6 +87,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
       this.debug('==== 导航栏插件开始初始化 ====');
 
+      // 给navigator添加平台标识
+      this.$element.data('platform', this.isIos() ? 1 : 0);
+
       // 填充DOM
       this.$element.html('\n        <div class="nav-bg"></div>\n        <div class="nav">\n          <div class="back"><i class="iconfont icon-back"></i></div>\n          <div class="title ' + this.options.titleAlign + '"><p class="inner"><span class="text">' + this.options.title + '</span></p></div>\n          ' + (this.options.showRightNav ? '<div class="other"><i class="iconfont icon-' + this.options.rightNavIcon + '"></i></div>' : '') + '\n        </div>\n      ');
 

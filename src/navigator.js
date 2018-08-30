@@ -80,6 +80,9 @@
     init: function () {
       this.debug('==== 导航栏插件开始初始化 ====');
 
+      // 给navigator添加平台标识
+      this.$element.data('platform', this.isIos() ? 1 : 0);
+
       // 填充DOM
       this.$element.html(`
         <div class="nav-bg"></div>

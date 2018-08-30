@@ -1,10 +1,10 @@
 // 通用css
 @mixin font-size($font-size) {
   font-size: $font-size;
-  [data-dpr='2'] & {
+  [data-dpr="2"] & {
     font-size: $font-size * 2;
   }
-  [data-dpr='3'] & {
+  [data-dpr="3"] & {
     font-size: $font-size * 3;
   }
 }
@@ -26,7 +26,7 @@ body {
   z-index: 10000;
   color: #ffffff;
   overflow: hidden;
-  @include font-size(16px);
+  @include font-size(20px);
   .nav-bg {
     position: absolute;
     top: 0;
@@ -50,7 +50,7 @@ body {
     text-align: center;
     .iconfont {
       line-height: $height;
-      @include font-size(18px);
+      @include font-size(26px);
     }
   }
   .title {
@@ -89,10 +89,24 @@ body {
     text-align: center;
     .iconfont {
       line-height: $height;
-      @include font-size(18px);
+      @include font-size(24px);
     }
   }
 }
+
+// 重置Android的字体大小
+.navigator[data-platform="0"] .back .iconfont {
+  @include font-size(24px);
+}
+
+.navigator[data-platform="0"]{
+  @include font-size(16px);
+}
+
+.navigator[data-platform="0"] .other .iconfont{
+  @include font-size(22px);
+}
+
 
 // 字体图标样式区
 
