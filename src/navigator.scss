@@ -5,7 +5,7 @@
     font-size: $font-size * 2;
   }
   [data-dpr='3'] & {
-    font-size: $font-size * 3.2;
+    font-size: $font-size * 3;
   }
 }
 
@@ -26,6 +26,7 @@ body {
   z-index: 10000;
   color: #ffffff;
   overflow: hidden;
+  @include font-size(16px);
   .nav-bg {
     position: absolute;
     top: 0;
@@ -38,9 +39,8 @@ body {
     position: relative;
     width: 100%;
     height: $height;
-    z-index: 10002;
+    z-index: 200000;
   }
-  @include font-size(14px);
   .back {
     position: absolute;
     top: 0;
@@ -50,7 +50,7 @@ body {
     text-align: center;
     .iconfont {
       line-height: $height;
-      @include font-size(14px);
+      @include font-size(18px);
     }
   }
   .title {
@@ -89,7 +89,7 @@ body {
     text-align: center;
     .iconfont {
       line-height: $height;
-      @include font-size(14px);
+      @include font-size(18px);
     }
   }
 }

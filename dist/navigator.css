@@ -14,7 +14,15 @@ body {
   z-index: 10000;
   color: #ffffff;
   overflow: hidden;
-  font-size: 14px;
+  font-size: 16px;
+}
+
+[data-dpr='2'] .navigator {
+  font-size: 32px;
+}
+
+[data-dpr='3'] .navigator {
+  font-size: 48px;
 }
 
 .navigator .nav-bg {
@@ -30,15 +38,7 @@ body {
   position: relative;
   width: 100%;
   height: 1.1733rem;
-  z-index: 10002;
-}
-
-[data-dpr='2'] .navigator {
-  font-size: 28px;
-}
-
-[data-dpr='3'] .navigator {
-  font-size: 44.8px;
+  z-index: 200000;
 }
 
 .navigator .back {
@@ -52,15 +52,15 @@ body {
 
 .navigator .back .iconfont {
   line-height: 1.1733rem;
-  font-size: 14px;
+  font-size: 18px;
 }
 
 [data-dpr='2'] .navigator .back .iconfont {
-  font-size: 28px;
+  font-size: 36px;
 }
 
 [data-dpr='3'] .navigator .back .iconfont {
-  font-size: 44.8px;
+  font-size: 54px;
 }
 
 .navigator .title {
@@ -105,15 +105,15 @@ body {
 
 .navigator .other .iconfont {
   line-height: 1.1733rem;
-  font-size: 14px;
+  font-size: 18px;
 }
 
 [data-dpr='2'] .navigator .other .iconfont {
-  font-size: 28px;
+  font-size: 36px;
 }
 
 [data-dpr='3'] .navigator .other .iconfont {
-  font-size: 44.8px;
+  font-size: 54px;
 }
 
 @font-face {

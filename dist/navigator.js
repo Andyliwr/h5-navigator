@@ -2,7 +2,7 @@
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-/*!
+/*
  * 同花顺H5自定义导航插件
  * @author andyliwr(lidikang@myhexin.com)
  * @date 2018/07/17
@@ -72,7 +72,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     showRightNav: false, // 是否展示导航最右边的按钮
     rightNavIcon: '', // 导航最右边的按钮图标名称，可选值more(更多)，share(分享)
     clickLeftNavCallback: null, // 点击导航最左边边的按钮图标的执行函数，如传空，默认跳转到上一页
-    clickRightNavCallback: null // 点击导航最右边的按钮图标的执行函数
+    clickRightNavCallback: null, // 点击导航最右边的按钮图标的执行函数
+    isExitWhenNoPageBack: false // 是否退出全屏webview当页面已经返回到顶部(history.length = 1) 
   };
 
   /**
@@ -98,20 +99,22 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       // 绑定点击事件
       // 双击标题回到顶部
       var lastClickTime = 0;
-      this.$element.on('click', function () {
-        var nowTime = new Date().getTime();
-        if (nowTime - lastClickTime < 400) {
-          _this.debug('触发了导航双击事件');
-          lastClickTime = 0;
-          _this.scrollToTop({
-            element: $(window),
-            toT: 0,
-            durTime: 300,
-            delay: 30,
-            callback: null
-          });
-        } else {
-          lastClickTime = nowTime;
+      this.$element.on('click', function (event) {
+        if (event.target.className.indexOf('text') > -1) {
+          var nowTime = new Date().getTime();
+          if (nowTime - lastClickTime < 400) {
+            _this.debug('触发了导航双击事件');
+            lastClickTime = 0;
+            _this.scrollToTop({
+              element: $(window),
+              toT: 0,
+              durTime: 300,
+              delay: 30,
+              callback: null
+            });
+          } else {
+            lastClickTime = nowTime;
+          }
         }
       });
 
@@ -121,7 +124,18 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         if (_this.options.clickLeftNavCallback && typeof _this.options.clickLeftNavCallback === 'function') {
           _this.options.clickLeftNavCallback.apply(_this);
         } else {
-          history.back();
+          _this.debug('执行了history.back');
+          _this.debug(history.length, callNativeHandler);
+          // 当页面返回到顶层的时候需要调用客户端协议退出webview
+          if (_this.options.isExitWhenNoPageBack && history.length === 1) {
+            if (typeof callNativeHandler === 'function') {
+              callNativeHandler('goback', { type: 'component' }, function (data) {});
+            } else {
+              history.back();
+            }
+          } else {
+            history.back();
+          }
         }
       });
 
@@ -137,50 +151,53 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
       // 页面滑动的时候自动隐藏导航栏
       if (this.options.autoHideNavArea) {
-        var areas = this.options.autoHideNavArea.split(',').filter(function (item) {
-          return $(item).length > 0;
-        });
-        // 改变透明度函数
-        var changeOpacity = function changeOpacity() {
-          var navHeight = _this.$element.height();
-          var scrollHeight = $(window).scrollTop();
-          var autoHideAreaElement = null; // 当前需要透明化导航的元素
-          // 判断当前是否处在需要隐藏的dom上
-          var isOnArea = areas.some(function (item) {
-            var currentElement = $(item);
-            if (currentElement && currentElement.offset()) {
-              // 控制当前导航处在元素覆盖范围内
-              if (currentElement.offset().top - scrollHeight <= 0 && currentElement.offset().top + currentElement.offset().height > scrollHeight) {
-                autoHideAreaElement = currentElement;
-                return true;
-              } else {
-                return false;
-              }
-            } else {
-              return false;
-            }
+        this.changeOpacity();
+        // IOS已经使用iscoll事件来模拟滚动故不需要监听window的scroll事件
+        if (!this.isIos()) {
+          // 监听window的scroll事件
+          $(window).on('scroll', function () {
+            _this.changeOpacity();
           });
-          if (isOnArea) {
-            // 去除body的padding-top，让页面在顶部展示
-            $('body').css('padding-top', '0');
-            // 计算导航高度到元素底部的距离，以此来决定透明度的值，40是偏移值
-            var opacity = (autoHideAreaElement.offset().top + autoHideAreaElement.offset().height + 80 - navHeight - scrollHeight) / autoHideAreaElement.offset().height;
-            opacity = opacity.toFixed(2);
-            if (opacity > 1) opacity = 1;
-            if (opacity < 0) opacity = 0;
-            _this.$element.find('.nav-bg').css('opacity', 1 - opacity);
-          } else {
-            // 不在自动隐藏区域透明度设置为1
-            if (_this.$element.find('.nav-bg').css('opacity') !== 1) {
-              _this.$element.find('.nav-bg').css('opacity', 1);
-            }
-          }
+        }
+      }
+
+      /**
+       * 修复ios下输入弹框弹出时fixed失效的问题
+       * 通过引入Iscoll来模拟浏览器的滚动
+       */
+      if (this.isIos()) {
+        // 动态引入iscoll.js
+        var script = document.createElement('script');
+        script.language = 'JavaScript';
+        script.type = 'text/javascript';
+        script.src = 'http://s.thsi.cn/js/m/kh/common/scripts/iscroll-probe.js';
+        document.body.appendChild(script);
+        script.onload = function (event) {
+          _this.debug('==== 加载iscroll.js成功 ====');
+          $('html, body').css({ height: '100%', overflow: 'hidden' });
+          $('.container').css('height', '100%');
+          var myIscroll = new IScroll('.container', {
+            //允许 滚轮 , 默认false
+            mouseWheel: true,
+            //允许  滚动条出现 ,并 滚动 , 默认 false
+            scrollbars: false,
+            probeType: 2
+            //滚动条 渐隐 渐现 , 默认 false
+            // fadeScrollbars: false,
+          });
+          myIscroll.on('scroll', function () {
+            _this.changeOpacity();
+          });
+          myIscroll.on('scrollStart', function () {
+            _this.changeOpacity();
+          });
+          myIscroll.on('scrollEnd', function () {
+            _this.changeOpacity();
+          });
         };
-        changeOpacity();
-        // 监听window的scroll事件
-        $(window).on('scroll', function () {
-          changeOpacity();
-        });
+        script.onerror = function (event) {
+          _this.debug('加载iscroll.js失败');
+        };
       }
     },
 
@@ -260,6 +277,51 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           }, 60);
         }, 3000);
       }
+    },
+
+    // 修改标题透明度
+    changeOpacity: function changeOpacity() {
+      var areas = this.options.autoHideNavArea.split(',').filter(function (item) {
+        return $(item).length > 0;
+      });
+      var navHeight = this.$element.height();
+      var scrollHeight = $(window).scrollTop();
+      var autoHideAreaElement = null; // 当前需要透明化导航的元素
+      // 判断当前是否处在需要隐藏的dom上
+      var isOnArea = areas.some(function (item) {
+        var currentElement = $(item);
+        if (currentElement && currentElement.offset()) {
+          // 控制当前导航处在元素覆盖范围内
+          if (currentElement.offset().top - scrollHeight <= 0 && currentElement.offset().top + currentElement.offset().height > scrollHeight) {
+            autoHideAreaElement = currentElement;
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return false;
+        }
+      });
+      if (isOnArea) {
+        // 去除body的padding-top，让页面在顶部展示
+        $('body').css('padding-top', '0');
+        // 计算导航高度到元素底部的距离，以此来决定透明度的值，40是偏移值
+        var opacity = (autoHideAreaElement.offset().top + autoHideAreaElement.offset().height + 80 - navHeight - scrollHeight) / autoHideAreaElement.offset().height;
+        opacity = opacity.toFixed(2);
+        if (opacity > 1) opacity = 1;
+        if (opacity < 0) opacity = 0;
+        this.$element.find('.nav-bg').css('opacity', 1 - opacity);
+      } else {
+        // 不在自动隐藏区域透明度设置为1
+        if (this.$element.find('.nav-bg').css('opacity') !== 1) {
+          this.$element.find('.nav-bg').css('opacity', 1);
+        }
+      }
+    },
+
+    // 判断当前是否是IOS系统
+    isIos: function isIos() {
+      return navigator.userAgent.indexOf('iPhone') > -1 || navigator.userAgent.indexOf('iPad') > -1 || navigator.userAgent.indexOf('Mac') > -1;
     }
   };
 
@@ -330,7 +392,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       var _loop = function _loop(i) {
         switch (i) {
           case 'title':
-            console.log($element);
             $element.find('.title .inner .text').html(newOptions[i]);
             break;
           case 'clickLeftNavCallback':

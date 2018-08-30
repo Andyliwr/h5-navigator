@@ -39,15 +39,20 @@
 
 </body>
 <div class="container">
-  <img class="header-img" src="http://khtest.10jqka.com.cn/dev/lidikang/index_bg.jpg" alt="">
-  <p class="main-text">这里是页面主体内容1</p>
-  <p class="main-text">这里是页面主体内容2</p>
-  <p class="main-text">这里是页面主体内容3</p>
-  <p class="main-text">这里是页面主体内容4</p>
-  <p class="main-text">这里是页面主体内容5</p>
+  <div class="inner">
+    <img class="header-img" src="http://khtest.10jqka.com.cn/dev/lidikang/index_bg.jpg" alt="">
+    <input type="text" />
+    <button onclick="history.back()">返回上一页</button>
+    <p class="main-text">这里是页面主体内容1</p>
+    <p class="main-text">这里是页面主体内容2</p>
+    <p class="main-text">这里是页面主体内容3</p>
+    <p class="main-text">这里是页面主体内容4</p>
+    <p class="main-text">这里是页面主体内容5</p>
+  </div>
 </div>
 <script type="text/javascript" src="//s.thsi.cn/js/m/js/zepto.min.js"></script>
-<script type="text/javascript" src="./navigator.js"></script>
+<script type="text/javascript" src="//s.thsi.cn/cb?js/m/business/;stat.js;share.js;js/m/common/;basic.js;user.js;cookie.js;bridge.js"></script>
+<script type="text/javascript" src="./navigator.min.js"></script>
 <script type="text/javascript">
   $(document).ready(function () {
     $.fn.H5Navigator.init({
@@ -59,7 +64,8 @@
       showRightNav: true, // 是否展示导航最右边的按钮
       rightNavIcon: 'share', // 导航最右边的按钮图标名称，可选值more(更多)，share(分享)
       clickLeftNavCallback: null, // 点击导航最左边边的按钮图标的执行函数，如传空，默认跳转到上一页
-      clickRightNavCallback: null // 点击导航最右边的按钮图标的执行函数
+      clickRightNavCallback: null, // 点击导航最右边的按钮图标的执行函数
+      isExitWhenNoPageBack: false // 是否退出全屏webview当页面已经返回到顶部(history.length = 1) 
     });
   })
 </script>
