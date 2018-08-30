@@ -1,6 +1,6 @@
 # 同花顺`H5`导航栏插件
 
-README: [English](README_en.md) | [中文](README_zh.md)
+README: [English](README_en.md) | [中文](README.md)
 
 插件化导航组件，只需要引入的`navigator.css`和`navigator.js`就能在页面顶部添加一个导航栏，插件实现了导航的自定义，还附加了很多新功能。
 

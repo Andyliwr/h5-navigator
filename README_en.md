@@ -1,6 +1,6 @@
 ## `H5` navigation bar plugin
 
-README: [English](README_en.md) | [Chinese](README_zh.md)
+README: [English](README_en.md) | [Chinese](README.md)
 
 Plug-in navigation components, you only need to introduce the `navigator.css` and `navigator.js` to add a navigation bar at the top of the page. The plug-in implements navigation customization and adds a lot of new features.
 
