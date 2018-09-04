@@ -39,7 +39,9 @@ $(document).ready(function () {
     showRightNav: true,
     rightNavIcon: 'share',
     clickLeftNavCallback: null,
-    clickRightNavCallback: null
+    clickRightNavCallback: null,
+    isExitWhenNoPageBack: true,
+    iosScrollBottomCallback: null
   });
 });
 ```
@@ -55,3 +57,30 @@ $(document).ready(function () {
 - `rightNavIcon`: navigate to the right button `iconfont` icon name
 - `clickLeftNavCallback`: Click the callback of the left button of the navigation. The default is `null`. If it is empty, the default function `history.back() will be executed.
 - `clickRightNavCallback`: Click the callback of the button on the right of the navigation
+- `isExitWhenNoPageBack`: Whether to exit full screen webview when the page has returned to the top (history.length = 1)
+- `iosScrollBottomCallback`: Swipe to the bottom callback function, IOS uses the original bottom statistics does not take effect, you need to customize
+
+## Custom Method
+
+- `$.fn.H5Navigator.changeOptions` to modify the properties of the current navigation
+
+  How to use
+
+```
+$.fn.H5Navigator.changeOptions({
+   Title: 'xxx', // navigation title
+   clickLeftNavCallback: () => {} // Navigating the click event of the left button
+})
+```
+
+## Update history
+
+### 2018/09/04
+
+1. Modify the navigation icon and the size of the font to be consistent with the native navigation
+2. Fix the bug where the mobile side double-clicks the navigation title and fails to return to the top.
+3. Fix the bug that the navigation transparency is not timely changed when sliding under IOS
+4. Fix the bug that the navigation bar fixed positioning is invalid when the IOS keyboard pops up.
+5. Fix IOS to return to the top of the page (history.length is equal to 1) continue to click to return to the unresponsive bug
+
+PS: The navigation bar has been added the iscoll plugin under ios, forcing the width of the body to be 100%, so the original bottom statistics method can not be used, please use the new plugin `iosScrollBottomCallback` callback function

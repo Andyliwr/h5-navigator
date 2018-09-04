@@ -39,7 +39,9 @@ $(document).ready(function () {
     showRightNav: true,
     rightNavIcon: 'share',
     clickLeftNavCallback: null,
-    clickRightNavCallback: null
+    clickRightNavCallback: null,
+    isExitWhenNoPageBack: true,
+    iosScrollBottomCallback: null
   });
 });
 ```
@@ -55,3 +57,30 @@ $(document).ready(function () {
 - `rightNavIcon`: 导航右边的按钮`iconfont`图标名称
 - `clickLeftNavCallback`: 点击导航左边按钮的回调, 默认为`null`，为空则会执行默认函数`history.back()`
 - `clickRightNavCallback`: 点击导航右边按钮的回调
+- `isExitWhenNoPageBack`: 当页面已经返回到顶部(history.length = 1)时，是否退出全屏 webview
+- `iosScrollBottomCallback`: 滑动到底部回调函数，IOS 使用原来的底部统计不生效，需要自定义
+
+## 自定义方法
+
+- `$.fn.H5Navigator.changeOptions`修改当前导航的属性
+
+  使用方法如下
+
+```
+$.fn.H5Navigator.changeOptions({
+  title: 'xxx', // 导航标题
+  clickLeftNavCallback: () => {} // 导航左边按钮的点击事件
+})
+```
+
+## 更新历史
+
+### 2018/09/04
+
+1. 修改导航图标以及字体的大小，与原生导航保持一致
+2. 修复移动端双击导航标题未能返回顶部的 bug
+3. 修复 IOS 下滑动的时候导航透明度修改不及时的 bug
+4. 修复 IOS 键盘弹出时导航拦 fixed 定位失效的 bug
+5. 修复 IOS 下返回页面顶层(history.length 等于 1)的时候继续点击返回无反应的 bug
+
+PS: 导航栏在 ios 下加入了 iscoll 插件，强制将 body 的宽度设置成了 100%，所以原来的底部统计方法不能使用了，请使用插件新增的 `iosScrollBottomCallback` 回调函数
