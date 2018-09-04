@@ -73,7 +73,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     rightNavIcon: '', // 导航最右边的按钮图标名称，可选值more(更多)，share(分享)
     clickLeftNavCallback: null, // 点击导航最左边边的按钮图标的执行函数，如传空，默认跳转到上一页
     clickRightNavCallback: null, // 点击导航最右边的按钮图标的执行函数
-    isExitWhenNoPageBack: false // 是否退出全屏webview当页面已经返回到顶部(history.length = 1) 
+    isExitWhenNoPageBack: false, // 是否退出全屏webview当页面已经返回到顶部(history.length = 1)
+    iosScrollBottomCallback: null // 滑动到底部统计函数
   };
 
   /**
@@ -98,28 +99,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
       // 判断标题是否超出，超出部分滚动显示
       this.scrollTitle();
-
-      // 绑定点击事件
-      // 双击标题回到顶部
-      var lastClickTime = 0;
-      this.$element.on('click', function (event) {
-        if (event.target.className.indexOf('text') > -1) {
-          var nowTime = new Date().getTime();
-          if (nowTime - lastClickTime < 400) {
-            _this.debug('触发了导航双击事件');
-            lastClickTime = 0;
-            _this.scrollToTop({
-              element: $(window),
-              toT: 0,
-              durTime: 300,
-              delay: 30,
-              callback: null
-            });
-          } else {
-            lastClickTime = nowTime;
-          }
-        }
-      });
 
       // 点击导航最左边按钮
       this.$element.find('.back').on('click', function () {
@@ -152,18 +131,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         });
       }
 
-      // 页面滑动的时候自动隐藏导航栏
-      if (this.options.autoHideNavArea) {
-        this.changeOpacity();
-        // IOS已经使用iscoll事件来模拟滚动故不需要监听window的scroll事件
-        if (!this.isIos()) {
-          // 监听window的scroll事件
-          $(window).on('scroll', function () {
-            _this.changeOpacity();
-          });
-        }
-      }
-
       /**
        * 修复ios下输入弹框弹出时fixed失效的问题
        * 通过引入Iscoll来模拟浏览器的滚动
@@ -180,27 +147,89 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           $('html, body').css({ height: '100%', overflow: 'hidden' });
           $('.container').css('height', '100%');
           var myIscroll = new IScroll('.container', {
-            //允许 滚轮 , 默认false
-            mouseWheel: true,
-            //允许  滚动条出现 ,并 滚动 , 默认 false
-            scrollbars: false,
-            probeType: 2
-            //滚动条 渐隐 渐现 , 默认 false
-            // fadeScrollbars: false,
+            mouseWheel: false, // 允许滚轮 , 默认false
+            scrollbars: false, // 允许滚动条出现 ,并滚动 , 默认false
+            probeType: _this.options.autoHideNavArea ? 3 : 1, // probeType为2表示定时执行，probeType为1表示定时执行
+            click: true, // 不默认组织click和touch事件
+            tap: true
+            // fadeScrollbars: false, //滚动条 渐隐 渐现 , 默认 false
           });
-          myIscroll.on('scroll', function () {
+
+          // 页面滑动的时候自动隐藏导航栏
+          if (_this.options.autoHideNavArea) {
             _this.changeOpacity();
-          });
-          myIscroll.on('scrollStart', function () {
-            _this.changeOpacity();
-          });
-          myIscroll.on('scrollEnd', function () {
-            _this.changeOpacity();
+            myIscroll.on('scroll', function () {
+              _this.changeOpacity();
+            });
+            myIscroll.on('scrollEnd', function () {
+              _this.changeOpacity();
+            });
+          }
+
+          if (_this.options.iosScrollBottomCallback) {
+            _this.hasScrollToBottom = false;
+            myIscroll.on('scrollEnd', function () {
+              if (Math.abs(myIscroll.y - myIscroll.maxScrollY) < 20 && myIscroll.directionY === 1 && !_this.hasScrollToBottom) {
+                if (typeof _this.options.iosScrollBottomCallback === 'function') {
+                  _this.options.iosScrollBottomCallback();
+                  _this.hasScrollToBottom = true;
+                }
+              }
+            });
+          }
+
+          // 双击标题滚动到顶部
+          var lastClickTime = 0;
+          // IOS click有300ms的延迟所以使用touchstart来替代click事件
+          _this.$element.find('.text').on('touchstart', function () {
+            var nowTime = new Date().getTime();
+            if (nowTime - lastClickTime < 400) {
+              _this.debug('触发了导航双击事件');
+              myIscroll.scrollTo(0, 0, 300);
+              // scrollTo事件不触发scroll事件，使用setTimeout弥补下
+              if (_this.options.autoHideNavArea) {
+                setTimeout(function () {
+                  _this.changeOpacity();
+                }, 300);
+              }
+            } else {
+              lastClickTime = nowTime;
+            }
           });
         };
-        script.onerror = function (event) {
+        script.onerror = function () {
           _this.debug('加载iscroll.js失败');
         };
+      } else {
+        // 双击标题回到顶部
+        var lastClickTime = 0;
+        this.$element.on('click', function (event) {
+          if (event.target.className.indexOf('text') > -1) {
+            var nowTime = new Date().getTime();
+            if (nowTime - lastClickTime < 400) {
+              _this.debug('触发了导航双击事件');
+              lastClickTime = 0;
+              _this.scrollToTop({
+                element: $(window),
+                toT: 0,
+                durTime: 300,
+                delay: 30,
+                callback: null
+              });
+            } else {
+              lastClickTime = nowTime;
+            }
+          }
+        });
+
+        // 页面滑动的时候自动隐藏导航栏
+        if (this.options.autoHideNavArea) {
+          this.changeOpacity();
+          // Android监听window的scroll事件
+          $(window).on('scroll', function () {
+            _this.changeOpacity();
+          });
+        }
       }
     },
 
@@ -237,14 +266,14 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         index++;
         var per = Math.round(subTop / dur);
         if (index >= dur) {
-          document.documentElement.scrollTop = t;
+          window.scrollTo(0, t);
           window.clearInterval(timer);
           if (opts.callback && typeof opts.callback == 'function') {
             opts.callback();
           }
           return;
         } else {
-          document.documentElement.scrollTop = curTop + index * per;
+          window.scrollTo(0, curTop + index * per);
         }
       };
 

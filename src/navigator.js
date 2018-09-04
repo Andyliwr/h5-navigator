@@ -5,7 +5,7 @@
  * @last_modified 2018/07/17 15:21
  */
 
-(function (factory) {
+(function(factory) {
   // 如果要兼容 CMD 等其他标准，可以在下面添加条件，比如：
   // CMD: typeof define === 'function' && define.cmd
   // UMD: typeof exports === 'object'
@@ -16,7 +16,7 @@
     // 如果要兼容 Zepto，可以改写，比如使用：factory(Zepto||jQuery)
     factory(Zepto);
   }
-})(function ($) {
+})(function($) {
   'use strict';
 
   /**
@@ -25,7 +25,7 @@
    * @param options 配置项
    * @constructor
    */
-  let Plugin = function (element, options) {
+  let Plugin = function(element, options) {
     //合并参数设置
     this.options = $.extend({}, Plugin.defaults, options);
 
@@ -68,7 +68,8 @@
     rightNavIcon: '', // 导航最右边的按钮图标名称，可选值more(更多)，share(分享)
     clickLeftNavCallback: null, // 点击导航最左边边的按钮图标的执行函数，如传空，默认跳转到上一页
     clickRightNavCallback: null, // 点击导航最右边的按钮图标的执行函数
-    isExitWhenNoPageBack: false // 是否退出全屏webview当页面已经返回到顶部(history.length = 1) 
+    isExitWhenNoPageBack: false, // 是否退出全屏webview当页面已经返回到顶部(history.length = 1)
+    iosScrollBottomCallback: null // 滑动到底部统计函数
   };
 
   /**
@@ -77,7 +78,7 @@
    */
   Plugin.prototype = {
     // 插件初始化事件
-    init: function () {
+    init: function() {
       this.debug('==== 导航栏插件开始初始化 ====');
 
       // 给navigator添加平台标识
@@ -99,28 +100,6 @@
       // 判断标题是否超出，超出部分滚动显示
       this.scrollTitle();
 
-      // 绑定点击事件
-      // 双击标题回到顶部
-      let lastClickTime = 0;
-      this.$element.on('click', event => {
-        if (event.target.className.indexOf('text') > -1) {
-          let nowTime = new Date().getTime();
-          if (nowTime - lastClickTime < 400) {
-            this.debug('触发了导航双击事件');
-            lastClickTime = 0;
-            this.scrollToTop({
-              element: $(window),
-              toT: 0,
-              durTime: 300,
-              delay: 30,
-              callback: null
-            });
-          } else {
-            lastClickTime = nowTime;
-          }
-        }
-      });
-
       // 点击导航最左边按钮
       this.$element.find('.back').on('click', () => {
         this.debug('触发了导航最左边图标的点击事件');
@@ -132,7 +111,7 @@
           // 当页面返回到顶层的时候需要调用客户端协议退出webview
           if (this.options.isExitWhenNoPageBack && history.length === 1) {
             if (typeof callNativeHandler === 'function') {
-              callNativeHandler('goback', { type: 'component' }, function (data) { });
+              callNativeHandler('goback', { type: 'component' }, function(data) {});
             } else {
               history.back();
             }
@@ -152,18 +131,6 @@
         });
       }
 
-      // 页面滑动的时候自动隐藏导航栏
-      if (this.options.autoHideNavArea) {
-        this.changeOpacity();
-        // IOS已经使用iscoll事件来模拟滚动故不需要监听window的scroll事件
-        if (!this.isIos()) {
-          // 监听window的scroll事件
-          $(window).on('scroll', () => {
-            this.changeOpacity();
-          });
-        }
-      }
-
       /**
        * 修复ios下输入弹框弹出时fixed失效的问题
        * 通过引入Iscoll来模拟浏览器的滚动
@@ -180,32 +147,94 @@
           $('html, body').css({ height: '100%', overflow: 'hidden' });
           $('.container').css('height', '100%');
           let myIscroll = new IScroll('.container', {
-            //允许 滚轮 , 默认false
-            mouseWheel: true,
-            //允许  滚动条出现 ,并 滚动 , 默认 false
-            scrollbars: false,
-            probeType: 2,
-            //滚动条 渐隐 渐现 , 默认 false
-            // fadeScrollbars: false,
+            mouseWheel: false, // 允许滚轮 , 默认false
+            scrollbars: false, // 允许滚动条出现 ,并滚动 , 默认false
+            probeType: this.options.autoHideNavArea ? 3 : 1, // probeType为2表示定时执行，probeType为1表示定时执行
+            click: true, // 不默认组织click和touch事件
+            tap: true
+            // fadeScrollbars: false, //滚动条 渐隐 渐现 , 默认 false
           });
-          myIscroll.on('scroll', () => {
+
+          // 页面滑动的时候自动隐藏导航栏
+          if (this.options.autoHideNavArea) {
             this.changeOpacity();
-          });
-          myIscroll.on('scrollStart', () => {
-            this.changeOpacity();
-          });
-          myIscroll.on('scrollEnd', () => {
-            this.changeOpacity();
+            myIscroll.on('scroll', () => {
+              this.changeOpacity();
+            });
+            myIscroll.on('scrollEnd', () => {
+              this.changeOpacity();
+            });
+          }
+
+          if (this.options.iosScrollBottomCallback) {
+            this.hasScrollToBottom = false;
+            myIscroll.on('scrollEnd', () => {
+              if (Math.abs(myIscroll.y - myIscroll.maxScrollY) < 20 && myIscroll.directionY === 1 && !this.hasScrollToBottom) {
+                if (typeof this.options.iosScrollBottomCallback === 'function') {
+                  this.options.iosScrollBottomCallback();
+                  this.hasScrollToBottom = true;
+                }
+              }
+            });
+          }
+
+          // 双击标题滚动到顶部
+          let lastClickTime = 0;
+          // IOS click有300ms的延迟所以使用touchstart来替代click事件
+          this.$element.find('.text').on('touchstart', () => {
+            let nowTime = new Date().getTime();
+            if (nowTime - lastClickTime < 400) {
+              this.debug('触发了导航双击事件');
+              myIscroll.scrollTo(0, 0, 300);
+              // scrollTo事件不触发scroll事件，使用setTimeout弥补下
+              if (this.options.autoHideNavArea) {
+                setTimeout(() => {
+                  this.changeOpacity();
+                }, 300);
+              }
+            } else {
+              lastClickTime = nowTime;
+            }
           });
         };
-        script.onerror = event => {
+        script.onerror = () => {
           this.debug('加载iscroll.js失败');
         };
+      } else {
+        // 双击标题回到顶部
+        let lastClickTime = 0;
+        this.$element.on('click', event => {
+          if (event.target.className.indexOf('text') > -1) {
+            let nowTime = new Date().getTime();
+            if (nowTime - lastClickTime < 400) {
+              this.debug('触发了导航双击事件');
+              lastClickTime = 0;
+              this.scrollToTop({
+                element: $(window),
+                toT: 0,
+                durTime: 300,
+                delay: 30,
+                callback: null
+              });
+            } else {
+              lastClickTime = nowTime;
+            }
+          }
+        });
+
+        // 页面滑动的时候自动隐藏导航栏
+        if (this.options.autoHideNavArea) {
+          this.changeOpacity();
+          // Android监听window的scroll事件
+          $(window).on('scroll', () => {
+            this.changeOpacity();
+          });
+        }
       }
     },
 
     // 插件调试函数，可根据openDebug参数选择打开或者关闭调试
-    debug: function () {
+    debug: function() {
       if (!!this.options.openDebug) {
         console.log.apply(this, arguments);
       }
@@ -216,7 +245,7 @@
      * @param options 滚动设置，例如 {element: 'body', toTop: 0, duration: 300, delay: 30, callback: () => {}}
      */
 
-    scrollToTop: function (options) {
+    scrollToTop: function(options) {
       let defaults = {
         element: $(window), // 滚动元素
         toT: 0, //滚动目标位置
@@ -233,28 +262,28 @@
       let index = 0;
       let dur = Math.round(opts.durTime / opts.delay);
 
-      const smoothScroll = function (t) {
+      const smoothScroll = function(t) {
         index++;
         let per = Math.round(subTop / dur);
         if (index >= dur) {
-          document.documentElement.scrollTop = t;
+          window.scrollTo(0, t);
           window.clearInterval(timer);
           if (opts.callback && typeof opts.callback == 'function') {
             opts.callback();
           }
           return;
         } else {
-          document.documentElement.scrollTop = curTop + index * per;
+          window.scrollTo(0, curTop + index * per);
         }
       };
 
-      timer = window.setInterval(function () {
+      timer = window.setInterval(function() {
         smoothScroll(opts.toT);
       }, opts.delay);
     },
 
     // 标题滚动显示函数
-    scrollTitle: function () {
+    scrollTitle: function() {
       let titleWidth = this.$element.find('.title').width(); // 标题最大宽度
       let titleInnerWidth = this.$element.find('.title .inner .text').width(); // 标题实际宽度
 
@@ -281,7 +310,7 @@
     },
 
     // 修改标题透明度
-    changeOpacity: function () {
+    changeOpacity: function() {
       const areas = this.options.autoHideNavArea.split(',').filter(item => {
         return $(item).length > 0;
       });
@@ -321,7 +350,7 @@
     },
 
     // 判断当前是否是IOS系统
-    isIos: function () {
+    isIos: function() {
       return navigator.userAgent.indexOf('iPhone') > -1 || navigator.userAgent.indexOf('iPad') > -1 || navigator.userAgent.indexOf('Mac') > -1;
     }
   };
@@ -336,8 +365,8 @@
    * 调用方式：$.fn.pluginName()
    * @param option {string/object}
    */
-  $.fn[Plugin.pluginName] = function (option) {
-    return this.each(function () {
+  $.fn[Plugin.pluginName] = function(option) {
+    return this.each(function() {
       let $this = $(this);
 
       let data = $.fn[Plugin.pluginName].pluginData[$this.data(Plugin.dataName)];
@@ -368,7 +397,7 @@
    * 为插件增加 noConflict 方法，在插件重名时可以释放控制权
    * @returns {*}
    */
-  $.fn[Plugin.pluginName].noConflict = function () {
+  $.fn[Plugin.pluginName].noConflict = function() {
     $.fn[Plugin.pluginName] = old;
     return this;
   };
@@ -377,7 +406,7 @@
    * 初始化导航
    * @param {{}}} options
    */
-  $.fn[Plugin.pluginName].init = function (options) {
+  $.fn[Plugin.pluginName].init = function(options) {
     // 自动插入dom
     $('<div data-role="' + Plugin.pluginName + '">')
       .addClass('navigator')
@@ -388,7 +417,7 @@
   /**
    * 修改导航属性
    */
-  $.fn[Plugin.pluginName].changeOptions = function (newOptions) {
+  $.fn[Plugin.pluginName].changeOptions = function(newOptions) {
     // 确保导航已经被初始化了
     let $element = $('[data-role="' + Plugin.pluginName + '"]');
     if ($element.length > 0) {
@@ -403,7 +432,7 @@
             $element
               .find('.nav .back')
               .off('click')
-              .on('click', function () {
+              .on('click', function() {
                 newOptions[i]();
               });
           }

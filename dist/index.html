@@ -12,7 +12,6 @@
   <script>eruda.init();</script>
   <style>
     html {
-      min-height: 100%;
       background: #e4e7ed !important;
     }
 
@@ -65,7 +64,10 @@
       rightNavIcon: 'share', // 导航最右边的按钮图标名称，可选值more(更多)，share(分享)
       clickLeftNavCallback: null, // 点击导航最左边边的按钮图标的执行函数，如传空，默认跳转到上一页
       clickRightNavCallback: null, // 点击导航最右边的按钮图标的执行函数
-      isExitWhenNoPageBack: true // 是否退出全屏webview当页面已经返回到顶部(history.length = 1) 
+      isExitWhenNoPageBack: true, // 是否退出全屏webview当页面已经返回到顶部(history.length = 1) 
+      iosScrollBottomCallback: function () {
+        console.log('滑动到底部');
+      }
     });
   })
 </script>
