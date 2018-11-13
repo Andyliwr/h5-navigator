@@ -9,7 +9,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
  * @last_modified 2018/07/17 15:21
  */
 
-(function (factory) {
+;(function (factory) {
   // 如果要兼容 CMD 等其他标准，可以在下面添加条件，比如：
   // CMD: typeof define === 'function' && define.cmd
   // UMD: typeof exports === 'object'
@@ -39,6 +39,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
     //进行一些初始化工作
     this.init();
+
+    // 设置body的padding-top
+    $('body').css('padding-top', this.$element.height());
   };
 
   /**
@@ -75,13 +78,13 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     clickRightNavCallback: null, // 点击导航最右边的按钮图标的执行函数
     isExitWhenNoPageBack: false, // 是否退出全屏webview当页面已经返回到顶部(history.length = 1)
     iosScrollBottomCallback: null // 滑动到底部统计函数
-  };
 
-  /**
-   * 定义插件的方法
-   * @type {{}}
-   */
-  Plugin.prototype = {
+
+    /**
+     * 定义插件的方法
+     * @type {{}}
+     */
+  };Plugin.prototype = {
     // 插件初始化事件
     init: function init() {
       var _this = this;
@@ -107,7 +110,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           _this.options.clickLeftNavCallback.apply(_this);
         } else {
           _this.debug('执行了history.back');
-          _this.debug(history.length, callNativeHandler);
           // 当页面返回到顶层的时候需要调用客户端协议退出webview
           if (_this.options.isExitWhenNoPageBack && history.length === 1) {
             if (typeof callNativeHandler === 'function') {
@@ -145,15 +147,18 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         script.onload = function (event) {
           _this.debug('==== 加载iscroll.js成功 ====');
           $('html, body').css({ height: '100%', overflow: 'hidden' });
-          $('.container').css('height', '100%');
+          $('.container').css({
+            height: $('body').height() - _this.$element.height()
+          });
           var myIscroll = new IScroll('.container', {
-            mouseWheel: false, // 允许滚轮 , 默认false
+            mouseWheel: true, // 允许滚轮 , 默认false
             scrollbars: false, // 允许滚动条出现 ,并滚动 , 默认false
             probeType: _this.options.autoHideNavArea ? 3 : 1, // probeType为2表示定时执行，probeType为1表示定时执行
             click: true, // 不默认组织click和touch事件
             tap: true
             // fadeScrollbars: false, //滚动条 渐隐 渐现 , 默认 false
           });
+          window.myIscroll = myIscroll;
 
           // 页面滑动的时候自动隐藏导航栏
           if (_this.options.autoHideNavArea) {
@@ -324,7 +329,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         var currentElement = $(item);
         if (currentElement && currentElement.offset()) {
           // 控制当前导航处在元素覆盖范围内
-          if (currentElement.offset().top - scrollHeight <= 0 && currentElement.offset().top + currentElement.offset().height > scrollHeight) {
+          var isOnInitArea = scrollHeight === 0 && currentElement.offset().top === navHeight;
+          if (isOnInitArea || currentElement.offset().top - scrollHeight <= 0 && currentElement.offset().top + currentElement.offset().height > scrollHeight) {
             autoHideAreaElement = currentElement;
             return true;
           } else {
@@ -336,7 +342,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       });
       if (isOnArea) {
         // 去除body的padding-top，让页面在顶部展示
-        $('body').css('padding-top', '0');
+        $('body').css('padding-top', '0 !important');
         // 计算导航高度到元素底部的距离，以此来决定透明度的值，40是偏移值
         var opacity = (autoHideAreaElement.offset().top + autoHideAreaElement.offset().height + 80 - navHeight - scrollHeight) / autoHideAreaElement.offset().height;
         opacity = opacity.toFixed(2);
@@ -355,12 +361,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     isIos: function isIos() {
       return navigator.userAgent.indexOf('iPhone') > -1 || navigator.userAgent.indexOf('iPad') > -1 || navigator.userAgent.indexOf('Mac') > -1;
     }
-  };
 
-  /**
-   * 缓存同名插件
-   */
-  var old = $.fn[Plugin.pluginName];
+    /**
+     * 缓存同名插件
+     */
+  };var old = $.fn[Plugin.pluginName];
 
   /**
    * 定义插件，扩展$.fn，为Zepto对象提供新的插件方法
