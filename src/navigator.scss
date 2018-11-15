@@ -1,5 +1,16 @@
 $height: 1.1733rem;
 
+// 设置字体大小
+@mixin font-size($font-size) {
+  font-size: $font-size / 2;
+  [data-dpr='2'] & {
+    font-size: $font-size;
+  }
+  [data-dpr='3'] & {
+    font-size: $font-size * 1.6;
+  }
+}
+
 // 主要样式区
 body {
   box-sizing: border-box;
@@ -84,7 +95,7 @@ body {
 
 // IOS下导航栏需要针对状态栏做额外的处理
 .navigator[data-platform='1'] {
-  padding-top: 0.2933rem;
+  padding-top: 0.5333rem;
   box-sizing: content-box;
 }
 

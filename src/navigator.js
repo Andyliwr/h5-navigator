@@ -147,13 +147,11 @@
         script.onload = event => {
           this.debug('==== 加载iscroll.js成功 ====')
           $('html, body').css({ height: '100%', overflow: 'hidden' })
-          $('.container').css({
-            height: $('body').height() - this.$element.height()
-          })
+          $('.container').css({ height: $('body').height() - this.$element.height() })
           let myIscroll = new IScroll('.container', {
             mouseWheel: true, // 允许滚轮 , 默认false
             scrollbars: false, // 允许滚动条出现 ,并滚动 , 默认false
-            probeType: this.options.autoHideNavArea ? 3 : 1, // probeType为2表示定时执行，probeType为1表示定时执行
+            probeType: this.options.autoHideNavArea ? 3 : 1, // probeType为3表示每隔1像素执行一次scroll事件, probeType为2表示定时执行，probeType为1表示定时执行
             click: true, // 不默认组织click和touch事件
             tap: true
             // fadeScrollbars: false, //滚动条 渐隐 渐现 , 默认 false
@@ -320,7 +318,12 @@
         return $(item).length > 0
       })
       const navHeight = this.$element.height()
-      const scrollHeight = $(window).scrollTop()
+      const isIos = this.isIos()
+      // 上拉刷新过程中不修改透明度
+      if (isIos && window.myIscroll.y > 0) {
+        return false
+      }
+      const scrollHeight = isIos ? Math.abs(window.myIscroll.y) : $(window).scrollTop()
       let autoHideAreaElement = null // 当前需要透明化导航的元素
       // 判断当前是否处在需要隐藏的dom上
       const isOnArea = areas.some(item => {
@@ -340,13 +343,19 @@
       })
       if (isOnArea) {
         // 去除body的padding-top，让页面在顶部展示
-        $('body').css('padding-top', '0 !important')
-        // 计算导航高度到元素底部的距离，以此来决定透明度的值，40是偏移值
-        let opacity = (autoHideAreaElement.offset().top + autoHideAreaElement.offset().height + 80 - navHeight - scrollHeight) / autoHideAreaElement.offset().height
-        opacity = opacity.toFixed(2)
-        if (opacity > 1) opacity = 1
-        if (opacity < 0) opacity = 0
-        this.$element.find('.nav-bg').css('opacity', 1 - opacity)
+        if (scrollHeight === 0) {
+          $('body').css('padding-top', '0 !important')
+          $('.container').css({ height: $('body').height() })
+          this.$element.find('.nav-bg').css('opacity', 0)
+          window.myIscroll.refresh()
+        } else {
+          // 计算导航高度到元素底部的距离，以此来决定透明度的值，40是偏移值
+          let opacity = (autoHideAreaElement.offset().top + autoHideAreaElement.offset().height + 80 - navHeight - scrollHeight) / autoHideAreaElement.offset().height
+          opacity = opacity.toFixed(2)
+          if (opacity > 1) opacity = 1
+          if (opacity < 0) opacity = 0
+          this.$element.find('.nav-bg').css('opacity', 1 - opacity)
+        }
       } else {
         // 不在自动隐藏区域透明度设置为1
         if (this.$element.find('.nav-bg').css('opacity') !== 1) {
